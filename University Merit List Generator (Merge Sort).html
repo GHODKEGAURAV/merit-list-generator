@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Merit List Generator · Merge Sort</title>
+<style>
+:root{--bg:#f3f5f1;--card:#fff;--ink:#16231d;--mute:#5d6b63;--line:#dde3dc;--pri:#0f5a46;--pri2:#e6f0eb;--hi:#e0a72b;--bar:#9fbfb2;--ok:#1b7a4b;--wait:#9a6a00;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1713;--card:#17221c;--ink:#e8efea;--mute:#93a39a;--line:#2a3a31;--pri:#5fcf9f;--pri2:#1d3027;--hi:#f0b93a;--bar:#3d5c4d;--ok:#5fcf9f;--wait:#f0b93a}}
+:root[data-theme="dark"]{--bg:#0f1713;--card:#17221c;--ink:#e8efea;--mute:#93a39a;--line:#2a3a31;--pri:#5fcf9f;--pri2:#1d3027;--hi:#f0b93a;--bar:#3d5c4d;--ok:#5fcf9f;--wait:#f0b93a}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Trebuchet MS",Verdana,sans-serif}
+h1,h2{font-family:Georgia,"Times New Roman",serif;margin:0;letter-spacing:-.01em}
+header{padding:28px 20px 8px;max-width:1100px;margin:auto}
+h1{font-size:clamp(26px,5vw,40px)}
+header p{color:var(--mute);margin:6px 0 0;max-width:640px}
+main{max-width:1100px;margin:auto;padding:12px 20px 40px;display:grid;gap:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px}
+h2{font-size:20px;margin-bottom:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
+label{font-size:13px;color:var(--mute);display:block;margin-bottom:3px}
+input{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);font:inherit}
+input:focus,button:focus-visible{outline:2px solid var(--pri);outline-offset:1px}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;align-items:center}
+button{padding:9px 14px;border-radius:6px;border:1px solid var(--pri);background:var(--card);color:var(--pri);font:inherit;font-weight:600;cursor:pointer}
+button.p{background:var(--pri);color:var(--bg)}
+button:disabled{opacity:.45;cursor:not-allowed}
+#err{color:#c0392b;font-size:13px;min-height:18px;margin-top:6px}
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:520px}
+th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--line);font-size:14px}
+th{color:var(--mute);font-weight:600;font-size:13px}
+.tag{padding:2px 8px;border-radius:99px;font-size:12px;font-weight:600;background:var(--pri2)}
+.sel{color:var(--ok)}.wl{color:var(--wait)}
+.viz{display:flex;align-items:flex-end;gap:4px;height:200px;padding:8px 0;border-bottom:1px solid var(--line);overflow-x:auto}
+.bar{flex:1 0 22px;background:var(--bar);border-radius:4px 4px 0 0;position:relative;transition:height .3s,background .3s;min-width:22px}
+.bar.on{background:var(--hi)}
+.bar span{position:absolute;bottom:-20px;left:0;right:0;text-align:center;font-size:11px;color:var(--mute)}
+.bar b{position:absolute;top:-17px;left:0;right:0;text-align:center;font-size:11px;font-weight:600}
+.vizbox{padding-bottom:22px}
+#msg{margin:12px 0 0;padding:10px 12px;background:var(--pri2);border-radius:6px;font-size:14px;min-height:42px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-top:12px}
+.stat{background:var(--pri2);border-radius:8px;padding:10px}
+.stat b{display:block;font-family:Georgia,serif;font-size:22px}
+.stat small{color:var(--mute)}
+.note{font-size:13px;color:var(--mute);margin-top:10px}
+code{background:var(--pri2);padding:1px 5px;border-radius:4px;font-size:13px}
+.empty{color:var(--mute);padding:14px 0}
+@media (prefers-reduced-motion:reduce){.bar{transition:none}}
+</style>
+</head>
+<body>
+<header>
+  <h1>University Merit List Generator</h1>
+  <p>Enter student marks and the list is ranked with Merge Sort, a divide-and-conquer algorithm that runs in O(n log n). Watch each split and merge happen step by step.</p>
+</header>
+<main>
+  <section class="card">
+    <h2>1. Add students</h2>
+    <div class="grid">
+      <div><label for="nm">Name</label><input id="nm" placeholder="e.g. Aarav Mehta"></div>
+      <div><label for="rl">Roll no.</label><input id="rl" placeholder="e.g. 101"></div>
+      <div><label for="m1">Maths (/100)</label><input id="m1" type="number" min="0" max="100"></div>
+      <div><label for="m2">Physics (/100)</label><input id="m2" type="number" min="0" max="100"></div>
+      <div><label for="m3">Chemistry (/100)</label><input id="m3" type="number" min="0" max="100"></div>
+      <div><label for="seats">Seats available</label><input id="seats" type="number" min="1" value="5"></div>
+    </div>
+    <div id="err" role="alert"></div>
+    <div class="row">
+      <button class="p" id="add">Add student</button>
+      <button id="rand">Add 10 random students</button>
+      <button id="clear">Clear all</button>
+    </div>
+    <p class="note">Ranking rule: higher total first. A tie goes to the higher Maths mark, then to the name in alphabetical order.</p>
+  </section>
+
+  <section class="card">
+    <h2>2. Students entered (<span id="cnt">0</span>)</h2>
+    <div class="tablewrap" id="input-list"></div>
+    <div class="row"><button class="p" id="gen">Generate merit list</button></div>
+  </section>
+
+  <section class="card" id="vizcard" hidden>
+    <h2>3. Merge sort in action</h2>
+    <div class="vizbox"><div class="viz" id="viz"></div></div>
+    <div id="msg"></div>
+    <div class="row">
+      <button id="prev">Back</button>
+      <button id="play" class="p">Play</button>
+      <button id="next">Step</button>
+      <button id="skip">Skip to end</button>
+      <label style="margin:0 0 0 8px">Speed <input type="range" id="spd" min="1" max="10" value="5" style="width:110px;padding:0"></label>
+    </div>
+    <div class="stats">
+      <div class="stat"><b id="s-n">0</b><small>students (n)</small></div>
+      <div class="stat"><b id="s-c">0</b><small>comparisons</small></div>
+      <div class="stat"><b id="s-m">0</b><small>merges</small></div>
+      <div class="stat"><b id="s-t">0 ms</b><small>sort time</small></div>
+    </div>
+    <p class="note">Bars show total marks. Highlighted bars are the section being merged right now. Time complexity: <code>O(n log n)</code> in best, average and worst cases. Extra space: <code>O(n)</code>.</p>
+  </section>
+
+  <section class="card" id="resultcard" hidden>
+    <h2>4. Final merit list</h2>
+    <div class="tablewrap" id="result"></div>
+    <div class="row"><button id="csv">Download CSV</button><button id="print">Print</button></div>
+  </section>
+
+  <section class="card">
+    <h2>How the algorithm works</h2>
+    <p><b>Divide:</b> split the list in half until each part holds one student. <b>Conquer:</b> a single student is already sorted. <b>Combine:</b> merge two sorted halves by repeatedly picking the better student from the front of each half.</p>
+    <p class="note">Merge sort is stable and always takes O(n log n), so it suits large merit lists better than bubble sort or insertion sort at O(n²).</p>
+  </section>
+</main>
+
+<script>
+let students = [], steps = [], pos = 0, timer = null, stats = {c:0, m:0, t:0};
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+// Comparator: true when x must rank above (before) y
+function better(x, y){
+  stats.c++;
+  if (x.total !== y.total) return x.total > y.total;
+  if (x.m1 !== y.m1) return x.m1 > y.m1;
+  return x.name.toLowerCase() <= y.name.toLowerCase();
+}
+
+// Merge sort that records a snapshot after every merge
+function mergeSort(a, l, r, out){
+  if (l >= r) return;
+  const mid = (l + r) >> 1;
+  mergeSort(a, l, mid, out);
+  mergeSort(a, mid + 1, r, out);
+  const left = a.slice(l, mid + 1), right = a.slice(mid + 1, r + 1);
+  let i = 0, j = 0, k = l;
+  while (i < left.length && j < right.length){
+    a[k++] = better(left[i], right[j]) ? left[i++] : right[j++];
+  }
+  while (i < left.length) a[k++] = left[i++];
+  while (j < right.length) a[k++] = right[j++];
+  stats.m++;
+  out.push({arr: a.slice(), l, r, text: `Merged positions ${l + 1} to ${r + 1}: left half (${left.length}) + right half (${right.length}) are now in rank order. Best of this section: ${a[l].name} (${a[l].total}).`});
+}
+
+function inputTable(){
+  $('cnt').textContent = students.length;
+  $('gen').disabled = students.length < 2;
+  if (!students.length){ $('input-list').innerHTML = '<div class="empty">No students yet. Add one above, or add random students to try it out.</div>'; return; }
+  $('input-list').innerHTML = '<table><tr><th>Roll</th><th>Name</th><th>Maths</th><th>Physics</th><th>Chemistry</th><th>Total</th></tr>' +
+    students.map(s => `<tr><td>${esc(s.roll)}</td><td>${esc(s.name)}</td><td>${s.m1}</td><td>${s.m2}</td><td>${s.m3}</td><td>${s.total}</td></tr>`).join('') + '</table>';
+}
+
+function add(){
+  const name = $('nm').value.trim(), roll = $('rl').value.trim();
+  const m = ['m1','m2','m3'].map(id => parseFloat($(id).value));
+  let e = '';
+  if (!name) e = 'Enter the student’s name.';
+  else if (!roll) e = 'Enter a roll number.';
+  else if (students.some(s => s.roll === roll)) e = 'That roll number is already in the list.';
+  else if (m.some(x => isNaN(x) || x < 0 || x > 100)) e = 'Marks must be numbers between 0 and 100.';
+  $('err').textContent = e;
+  if (e) return;
+  students.push({name, roll, m1:m[0], m2:m[1], m3:m[2], total:m[0] + m[1] + m[2]});
+  ['nm','rl','m1','m2','m3'].forEach(id => $(id).value = '');
+  $('nm').focus(); resetViz(); inputTable();
+}
+
+function randomStudents(){
+  const names = ['Aarav Mehta','Diya Sharma','Rohan Patil','Ananya Iyer','Kabir Singh','Meera Nair','Vihaan Joshi','Isha Kulkarni','Arjun Reddy','Saanvi Gupta','Neha Deshmukh','Aditya Rao','Priya Menon','Karan Shah','Tara Bose'];
+  let base = 100 + students.length;
+  for (let i = 0; i < 10; i++){
+    const nm = names[Math.floor(Math.random() * names.length)];
+    const r = () => 35 + Math.floor(Math.random() * 66);
+    const a = r(), b = r(), c = r();
+    students.push({name:nm, roll:String(base + i + 1), m1:a, m2:b, m3:c, total:a + b + c});
+  }
+  resetViz(); inputTable();
+}
+
+function resetViz(){
+  clearInterval(timer); timer = null; $('play').textContent = 'Play';
+  $('vizcard').hidden = true; $('resultcard').hidden = true;
+}
+
+function generate(){
+  resetViz();
+  const a = students.map(s => ({...s}));
+  steps = [{arr: a.slice(), l:-1, r:-1, text:`Starting order: ${a.length} students in the order they were entered. Merge sort will split them in half again and again, then merge.`}];
+  stats = {c:0, m:0, t:0};
+  const t0 = performance.now();
+  mergeSort(a, 0, a.length - 1, steps);
+  stats.t = (performance.now() - t0).toFixed(2);
+  pos = 0;
+  $('vizcard').hidden = false;
+  $('s-n').textContent = a.length; $('s-c').textContent = stats.c; $('s-m').textContent = stats.m; $('s-t').textContent = stats.t + ' ms';
+  draw(); result(a);
+  $('vizcard').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function draw(){
+  const st = steps[pos], max = Math.max(...st.arr.map(s => s.total), 1);
+  $('viz').innerHTML = st.arr.map((s, i) =>
+    `<div class="bar ${i >= st.l && i <= st.r && st.l >= 0 ? 'on' : ''}" style="height:${Math.max(8, s.total / max * 100)}%" title="${esc(s.name)}"><b>${s.total}</b><span>${esc(s.roll)}</span></div>`).join('');
+  $('msg').textContent = `Step ${pos} of ${steps.length - 1}. ${st.text}`;
+  $('prev').disabled = pos === 0; $('next').disabled = pos === steps.length - 1;
+  if (pos === steps.length - 1 && timer){ clearInterval(timer); timer = null; $('play').textContent = 'Replay'; }
+}
+
+function result(a){
+  const seats = Math.max(1, parseInt($('seats').value) || 1);
+  $('result').innerHTML = '<table><tr><th>Rank</th><th>Roll</th><th>Name</th><th>Maths</th><th>Physics</th><th>Chemistry</th><th>Total</th><th>%</th><th>Status</th></tr>' +
+    a.map((s, i) => `<tr><td><b>${i + 1}</b></td><td>${esc(s.roll)}</td><td>${esc(s.name)}</td><td>${s.m1}</td><td>${s.m2}</td><td>${s.m3}</td><td>${s.total}</td><td>${(s.total / 3).toFixed(1)}</td>
+    <td><span class="tag ${i < seats ? 'sel' : 'wl'}">${i < seats ? 'Selected' : 'Waitlist'}</span></td></tr>`).join('') + '</table>';
+  $('resultcard').hidden = false;
+  window._final = a;
+}
+
+function play(){
+  if (timer){ clearInterval(timer); timer = null; $('play').textContent = 'Play'; return; }
+  if (pos === steps.length - 1) pos = 0;
+  $('play').textContent = 'Pause';
+  const delay = 1100 - $('spd').value * 100;
+  timer = setInterval(() => { if (pos < steps.length - 1){ pos++; draw(); } }, delay);
+  draw();
+}
+
+function csv(){
+  const rows = [['Rank','Roll','Name','Maths','Physics','Chemistry','Total']].concat(window._final.map((s, i) => [i + 1, s.roll, '"' + s.name.replace(/"/g, '""') + '"', s.m1, s.m2, s.m3, s.total]));
+  const blob = new Blob([rows.map(r => r.join(',')).join('\n')], {type:'text/csv'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'merit-list.csv'; a.click();
+}
+
+$('add').onclick = add;
+$('rand').onclick = randomStudents;
+$('clear').onclick = () => { students = []; resetViz(); inputTable(); };
+$('gen').onclick = generate;
+$('play').onclick = play;
+$('next').onclick = () => { if (pos < steps.length - 1){ pos++; draw(); } };
+$('prev').onclick = () => { if (pos > 0){ pos--; draw(); } };
+$('skip').onclick = () => { pos = steps.length - 1; draw(); };
+$('spd').oninput = () => { if (timer){ clearInterval(timer); timer = null; play(); } };
+$('seats').oninput = () => { if (window._final && !$('resultcard').hidden) result(window._final); };
+$('csv').onclick = csv;
+$('print').onclick = () => window.print();
+['nm','rl','m1','m2','m3'].forEach(id => $(id).addEventListener('keydown', e => { if (e.key === 'Enter') add(); }));
+inputTable();
+</script>
+</body>
+</html>
